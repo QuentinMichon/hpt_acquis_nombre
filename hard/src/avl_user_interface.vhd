@@ -102,13 +102,13 @@ begin
 						      reg_readdata_s <= (31 downto 10 => '0') & switch_i;
 								cmd_readdatavalid_s <= '1'; 
 						  when 3 =>
-						      reg_readdata_s <= (31 downto 10 => '0') & "0000000000"; --TODO mettre le registre des LED SoC
+						      reg_readdata_s <= (31 downto 10 => '0') & reg_leds_soc_s;
 								cmd_readdatavalid_s <= '1';
 						  when 4 =>
-						      reg_readdata_s <= (31 downto 2 => '0') & "00"; --TODO mettre le registre du Status
+						      reg_readdata_s <= (31 downto 2 => '0') & reg_status_s;
 								cmd_readdatavalid_s <= '1';
 						  when 5 =>
-						      reg_readdata_s <= (31 downto 5 => '0') & "0" & (3 downto 2 => '0') & "00"; --TODO mettre mode_gen et delay_gen 
+						      reg_readdata_s <= (31 downto 5 => '0') & reg_mode_gen & (3 downto 2 => '0') & reg_delay_gen; 
 								cmd_readdatavalid_s <= '1';
 						  --when 6 =>
 								-- AVAILABLE FOR NEW FUNCTIONALITY
@@ -183,5 +183,7 @@ begin
     end process;
 	 -- Interface management
 
+	 
+	 
     
 end rtl; 

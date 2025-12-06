@@ -273,3 +273,16 @@ java.io.FileNotFoundException: https://community.arm.com/view-browse-feed.jspa?c
 	at com.arm.newsfeed.rss.AggregatedFeed.fetch(AggregatedFeed.java:221)
 	at com.arm.newsfeed.rss.AggregatedFeed.access$3(AggregatedFeed.java:217)
 	at com.arm.newsfeed.rss.AggregatedFeed$3.run(AggregatedFeed.java:196)
+
+!ENTRY com.arm.newsfeed 4 0 2025-12-06 17:06:31.705
+!MESSAGE Error when reading RSS feed "https://community.arm.com/view-browse-feed.jspa?containerType=700&userID=-1&browseSite=place-content&filterID=contentstatus[published]~objecttype~objecttype[blogpost]&browseViewID=placeContent&containerID=1060"
+!STACK 0
+java.io.FileNotFoundException: https://community.arm.com/view-browse-feed.jspa?containerType=700&userID=-1&browseSite=place-content&filterID=contentstatus[published]~objecttype~objecttype[blogpost]&browseViewID=placeContent&containerID=1060
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1915)
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1515)
+	at java.base/sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:250)
+	at com.sun.syndication.io.XmlReader.<init>(XmlReader.java:174)
+	at com.sun.syndication.io.XmlReader.<init>(XmlReader.java:151)
+	at com.arm.newsfeed.rss.AggregatedFeed.fetch(AggregatedFeed.java:221)
+	at com.arm.newsfeed.rss.AggregatedFeed.access$3(AggregatedFeed.java:217)
+	at com.arm.newsfeed.rss.AggregatedFeed$3.run(AggregatedFeed.java:196)
