@@ -47,18 +47,26 @@ uint32_t get_nbr_x(int nbr){
 
 uint32_t get_nbr_code(uint32_t nbr){
     
-    volatile uint32_t mask = (0b11 << 22);
-    volatile uint32_t number = get_nbr_x(nbr);
+    volatile uint32_t mask = (3 << 22);
+    volatile uint32_t number32 = get_nbr_x(nbr);
+    volatile uint32_t code = (number32 & mask) >> 22;
+
    
-    return (number & mask) >> 22;
+    //printf("nbr_code : %lu \n", code);
+
+    return code;
 }
 
 uint32_t get_nbr_value(uint32_t nbr){
     
     uint32_t mask = (1u << 22) - 1u; //garder que les bits 0 à 21
-    uint32_t number = get_nbr_x(nbr);
+    uint32_t number32 = get_nbr_x(nbr);
     
-    return number & mask;
+    uint32_t number = number32 & mask;
+
+    //printf("nbr_value : %lu \n", number);
+    
+    return number;
 }
 
 //status functions
@@ -69,7 +77,7 @@ uint32_t read_status(){
     
 void new_nbr(bool n){ 
     uint32_t status = BASE_ADD(STATUS);
-    uint32_t mask = (1 << 3);
+    uint32_t mask = (1 << 4);
     
     if (n)
         BASE_ADD(STATUS) = (status | mask);
@@ -77,47 +85,54 @@ void new_nbr(bool n){
         BASE_ADD(STATUS) = (status | ~mask);
 }
     
-void init_nbr(bool init){ // il faut dir quio écrire !
+void init_nbr(bool init){ 
     uint32_t mask = 1;
     uint32_t status = BASE_ADD(STATUS);
     
     if (init)
         BASE_ADD(STATUS) = (status | mask);
     else 
-        BASE_ADD(STATUS) = (status | ~mask);
+        BASE_ADD(STATUS) = (status & ~mask); //ici ??
 }
 
 //gen_function
 uint32_t get_mode_gen(){
-    uint32_t mask = (0b1 << 3);
-    uint32_t gen = (BASE_ADD(GEN) & mask) >> 3;
+    uint32_t mask = (1 << 4);
+    uint32_t gen = BASE_ADD(GEN);
     
-    return (mask & gen);
+    uint32_t mode = (gen & mask) >> 4;
+    
+    
+    return (mode);
 }
 
 uint32_t get_delay_gen(){
-    uint32_t mask = (0b11);
+    uint32_t mask = (3);
     uint32_t gen = BASE_ADD(GEN);
     
     return (mask & gen);
 }
 
-void write_mode_gen(bool mode){
+void write_mode_gen(uint32_t mode){ //ici
     uint32_t mask = (1 << 4);
     uint32_t gen = BASE_ADD(GEN);
        
     if (mode) 
-        BASE_ADD(GEN) = (mask | gen);
+        gen |= mask;
     else
-        BASE_ADD(GEN) = (~mask & gen);
+        gen &= ~mask;
+    
+    BASE_ADD(GEN) = gen;
     
 }
 
-void write_delay_gen(uint32_t delay){ 
-    uint32_t mask = ~(0b11);
-    uint32_t gen_without_delay = BASE_ADD(GEN) & mask;
+void write_delay_gen(uint32_t delay){ //ici
+    uint32_t gen = BASE_ADD(GEN);
     
-    BASE_ADD(GEN) = delay & gen_without_delay;
+    gen &= ~0x3;
+    gen |= (delay & 0x3);
+    
+    BASE_ADD(GEN) = gen;
 }
 
 uint32_t get_user_id(){
@@ -234,13 +249,17 @@ void Leds_toggle(uint32_t maskleds){
     insert_value(&PIO0_REG(PIO_DATA), LED_FIRST_BIT, LED_LENGTH, new_leds);
 }
 
-
+    //correction pour labo
 bool Key_read(int key_number){
     if (key_number < 0 || key_number >= (int)KEY_LENGTH) return false; //sécurité
-    
-    uint32_t bit = (PIO0_REG(PIO_DATA) >> (KEY_FIRST_BIT + (uint32_t)key_number)) & 1u;
+        
+    uint32_t buttons = get_buttons();
+    uint32_t mask = 1 << key_number;
+    uint32_t bit = buttons & mask;
     return bit ? false : true; 
 }
+
+
     
 
 void Seg7_write(int seg7_number, uint32_t value){

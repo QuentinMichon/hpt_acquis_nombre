@@ -24,6 +24,7 @@
 *****************************************************************************************/
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include "axi_lw.h"
 
 
@@ -59,7 +60,7 @@ void init_nbr(bool init);
 uint32_t get_mode_gen();
 uint32_t get_delay_gen();
 
-void write_mode_gen(bool mode);
+void write_mode_gen(uint32_t mode);
 void write_delay_gen(uint32_t delay);
 
 //USER_ID

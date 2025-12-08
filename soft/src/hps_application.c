@@ -34,7 +34,9 @@ int __auto_semihosting;
 int err_cum = 0;
 
 bool key_pressed(int key_number);
+bool key_holding(int key_number);
 
+bool holding = false;
 
 int main(void){
     
@@ -52,17 +54,21 @@ int main(void){
 
     
     while (1){
+
         //copie des valeur des sw sur les leds en continu...
         uint32_t sw = get_switchs();
         put_leds(sw);
 
         //selection de la fréquence avec sw98 !
         uint32_t mask = (3 << 8);
-        write_delay_gen(sw & mask);
+        uint32_t delay = (sw & mask) >> 8;
+        write_delay_gen(delay);
         
         //mode de généraation avec sw7
         mask = (1 << 7);
-        write_mode_gen(mask & sw);
+        uint32_t mode = (sw & mask) >> 7;
+        //printf("mode : %d \n", mode);
+        write_mode_gen(mode);
         
         //acquisition fiable avec sw0 (partie 2) 
         //TODO
@@ -74,32 +80,48 @@ int main(void){
         
         if (key_pressed(1)){ //réf
             //générer un nouveal ensemble de 4 nombres (ssi mode manuel est selectionné)
-            if (get_mode_gen() == 1)
+            if (get_mode_gen() == 0) //mode_gen 0 = manuel !
                 new_nbr(true);
         }
         
-        if (key_pressed(2)){ //TODO : key2 actif... //réf
+        if (key_holding(2)){
+            //génerer nouveaux nombres à chaque boucle si on est en mode auto
+            if (get_mode_gen() == 1){ //mode_gen 1 = auto !
+                new_nbr(true);
+                //printf("new nbr car mode = 1\n");
+            }
+            
             //lecture successive des 4 nombres
+            uint32_t n0 = get_nbr_value(0);
+            uint32_t n1 = get_nbr_value(1);
+            uint32_t n2 = get_nbr_value(2);
+            uint32_t n3 = get_nbr_value(3);
+            
             //vérif : 
-            uint32_t sum = get_nbr_value(0) + get_nbr_value(1) + get_nbr_value(1);
-            bool equal = (sum == get_nbr_value(3));
+            uint32_t sum = n0 + n1 + n2;
+            bool equal = (sum == n3);
             
             if (equal){
-                printf("OK : status: %d, nbr_a: %d, nbr_b: %d, nbr_c: %d, nbr_d: %d, \n",
-                       read_status(), get_nbr_value(0), get_nbr_value(1), get_nbr_value(2), get_nbr_value(3)); //TODO : vérifier sous quelle forme afficher status 
+                
+                printf("%-3s : status: %-7lu, nbr_a: %-7lu, nbr_b: %-7lu, nbr_c: %-7lu, nbr_d: %-7lu, \n",
+                       "OK",
+                       read_status(),n0, n1, n2, n3); //TODO : vérifier sous quelle forme afficher status 
             }
             
             else {
-                printf("ER : status: %d, nbr_a: %d, nbr_b: %d, nbr_c: %d, nbr_d: %d, \n",
-                     read_status(), get_nbr_value(0), get_nbr_value(1), get_nbr_value(2), get_nbr_value(3)); //TODO : vérifier sous quelle forme afficher status
+                printf("%-3s : status: %-7lu, nbr_a: %-7lu, nbr_b: %-7lu, nbr_c: %-7lu, nbr_d: %-7lu, \n",
+                    "ER",
+                       read_status(),n0, n1, n2, n3); //TODO : vérifier sous quelle forme afficher status 
         
-                printf("ER : nombre d'erreur cumulée : %d \n", err_cum);
                 ++err_cum;
+                printf("ER : nombre d'erreur cumulée : %d \n", err_cum);
             }
         }
     }
 }
 
+
+/* -------------------------------------------------- */
 // fonction pour "presser un bouton"
 bool key_pressed(int key_number) {
     static bool prev_state[4] = {false, false, false, false};
@@ -107,4 +129,8 @@ bool key_pressed(int key_number) {
     bool rising = (!prev_state[key_number] && current); //ne returne true que quand current = true et previous est false -> n'arrive que quand on commance à appuyer
     prev_state[key_number] = current;
     return rising;
+}
+
+bool key_holding(int key_number) {
+    return Key_read(key_number);
 }
