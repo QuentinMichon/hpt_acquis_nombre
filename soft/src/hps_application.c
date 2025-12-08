@@ -103,18 +103,18 @@ int main(void){
             
             if (equal){
                 
-                printf("%-3s : status: %-7lu, nbr_a: %-7lu, nbr_b: %-7lu, nbr_c: %-7lu, nbr_d: %-7lu, \n",
+                printf("%-3s : status: %-7lu, somme: %-7lu, nbr_a: %-7lu, nbr_b: %-7lu, nbr_c: %-7lu, nbr_d: %-7lu, \n",
                        "OK",
-                       read_status(),n0, n1, n2, n3); //TODO : vérifier sous quelle forme afficher status 
+                       read_status(),sum, n0, n1, n2, n3); //TODO : vérifier sous quelle forme afficher status 
             }
             
             else {
-                printf("%-3s : status: %-7lu, nbr_a: %-7lu, nbr_b: %-7lu, nbr_c: %-7lu, nbr_d: %-7lu, \n",
+                printf("%-3s : status: %-7lu, somme: %-7lu, nbr_a: %-7lu, nbr_b: %-7lu, nbr_c: %-7lu, nbr_d: %-7lu, \n",
                     "ER",
-                       read_status(),n0, n1, n2, n3); //TODO : vérifier sous quelle forme afficher status 
+                       read_status(),sum,n0, n1, n2, n3); //TODO : vérifier sous quelle forme afficher status 
         
-                ++err_cum;
                 printf("ER : nombre d'erreur cumulée : %d \n", err_cum);
+                ++err_cum;
             }
         }
     }

@@ -145,12 +145,12 @@ uint32_t get_buttons(){
 }
 
 uint32_t get_switchs(){
-    uint32_t mask = (1u << 9) - 1u;
+    uint32_t mask = (1u << 10) - 1u;
     return (BASE_ADD(SWITCHS) & mask);
 }
 
 uint32_t get_leds(){
-    uint32_t mask = (1u << 9) - 1u;
+    uint32_t mask = (1u << 10) - 1u;
     return (BASE_ADD(LEDS) & mask);
 }
 
