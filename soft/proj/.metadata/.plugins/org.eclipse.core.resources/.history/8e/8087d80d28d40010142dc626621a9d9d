@@ -1,0 +1,64 @@
+/*****************************************************************************************
+ * HEIG-VD
+ * Haute Ecole d'Ingenerie et de Gestion du Canton de Vaud
+ * School of Business and Engineering in Canton de Vaud
+ *****************************************************************************************
+ * REDS Institute
+ * Reconfigurable Embedded Digital Systems
+ *****************************************************************************************
+ *
+ * File                 : hps_application.c
+ * Author               : 
+ * Date                 : 
+ *
+ * Context              : ARE lab
+ *
+ *****************************************************************************************
+ * Brief: Conception d'une interface évoluée sur le bus Avalon avec la carte DE1-SoC
+ *
+ *****************************************************************************************
+ * Modifications :
+ * Ver    Date        Student      Comments
+ * 
+ *
+*****************************************************************************************/
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include "axi_lw.h"
+
+int __auto_semihosting;
+
+//AXI_LW_USER_INTERFACE_REG
+
+int main(void){
+    
+    printf("Laboratoire: Conception d'une interface évoluée \n");
+    
+    // TO BE COMPLETE
+    uint32_t board_id = AXI_LW_REG(0x0);
+    printf("Board ID = 0x%08X\n", (unsigned int) board_id);
+
+    uint32_t base = AXI_LW_REG(0x10000);
+    printf("Base : 0x%08X\n", (unsigned int) base);
+
+
+    uint32_t base2 = AXI_LW_REG(0x10004);
+    printf("Base2 : 0x%08X\n", (unsigned int) base2);
+
+    while(1) {
+    	if(rising_edge(0)) {
+    		AXI_LW_USER_INTERFACE_REG(0x1000C) &= AXI_LW_USER_INTERFACE_REG(0x10008); // LED = SWITCH
+    	}
+
+    	if(rising_edge(1)) {
+
+    	}
+
+    	if(rising_edge(2)) {
+
+    	}
+    }
+
+    return 0;
+}

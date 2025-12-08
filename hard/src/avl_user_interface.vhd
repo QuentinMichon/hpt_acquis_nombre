@@ -81,6 +81,13 @@ begin
 	 avl_readdatavalid_o <= cmd_readdatavalid_s;
 	 avl_readdata_o      <= reg_readdata_s;
 	 
+	 led_o <= reg_leds_soc_s;
+	 
+	 cmd_init_o <= cmd_init_nbr;
+	 cmd_new_nbr_o <= cmd_new_nbr;
+	 auto_o <= reg_mode_gen;
+	 delay_o <= reg_delay_gen;
+	 
     -- Read access part
     read_access_p : process(avl_reset_i, avl_clk_i)
 	 begin

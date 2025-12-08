@@ -1,0 +1,126 @@
+/*****************************************************************************************
+* HEIG-VD
+ * Haute Ecole d'Ingenerie et de Gestion du Canton de Vaud
+ * School of Business and Engineering in Canton de Vaud
+ *****************************************************************************************
+ * REDS Institute
+ * Reconfigurable Embedded Digital Systems
+ *****************************************************************************************
+ *
+ * File                 : function.h
+ * Author               : Quentin Michon
+ * Date                 : 29.10.2025
+ *
+ * Context              : ARE lab03
+ *
+ *****************************************************************************************
+ * Brief: Header file for USER INTERFACE function
+ *
+ *****************************************************************************************
+ * Modifications :
+ * Ver    Date        Student      Comments
+ * 0.0    29.10.2025  QLM           Initial version.
+ *
+*****************************************************************************************/
+#include "function.h"
+
+static int square_shift = 0;  // permet de savoir sur quelle ligne du carre ecrire
+
+bool rd_key(const unsigned char key) {
+    if(key > 3) {
+        printf("key_number is too height");
+        return false;
+    }
+    return (REG_KEYS & (1 << key)) == 0;
+}
+
+bool rising_edge(const unsigned char key) {
+    static bool prev_key_0 = false;
+    static bool prev_key_1 = false;
+    static bool prev_key_2 = false;
+    static bool prev_key_3 = false;
+
+    bool rise;
+
+    bool current = rd_key(key);
+
+    switch(key) {
+        case 0:
+            rise = (!prev_key_0 && current);
+            prev_key_0 = current;
+            break;
+        case 1:
+            rise = (!prev_key_1 && current);
+            prev_key_1 = current;
+            break;
+        case 2:
+            rise = (!prev_key_2 && current);
+            prev_key_2 = current;
+            break;
+        case 3:
+            rise = (!prev_key_3 && current);
+            prev_key_3 = current;
+            break;
+        default:
+            rise = false;
+            printf("Key number not supported : return false by default\n");
+    }
+
+    return rise;
+}
+
+word_t rd_switch(const word_t mask) {
+    return (REG_SWITCHES & mask);
+}
+
+void wr_leds_soc(const word_t leds_data) {
+    REG_LEDS_SOC = (REG_LEDS_SOC & ~MASK_LEDS_SOC) | leds_data; // permet de ne pas modifier les autres bits si plus tard, ils seront utilisé
+}
+
+int rd_keys_0_1() {
+    return (int) (REG_KEYS & 0x3) ^ 0x3;
+}
+
+void wr_max10_leds(const word_t leds_data, const sel_t zone, const bool square_full) {
+	if(FLG_WE) {
+		switch (zone) {
+		    case SEL_00:
+		        REG_DATA_00 = leds_data;
+		        break;
+		    case SEL_01:
+		        REG_DATA_01 = leds_data;
+		        break;
+		    case SEL_10:
+		        REG_DATA_10 = leds_data;
+		        break;
+		    case SEL_11:
+		    	if(square_full) {
+		    		// ecrit sur les 25 leds du carre
+		    		REG_DATA_11 = leds_data;
+		    	} else {
+		    		// recopie uniquement les switchs 7 a 0
+		    		// en prenant compte du decallage enregistre
+		    		REG_DATA_11 = ROL(leds_data, square_shift);
+		    	}
+		        break;
+		    default:
+		        printf("error : max10 zone not valid\n");
+		}
+	}
+}
+
+void shift_square() {
+	square_shift = (square_shift + 1) % 5;
+}
+
+
+void wr_max10_leds_off() {
+    while (!FLG_WE){}
+    wr_max10_leds(0x0, SEL_00, true);
+    while (!FLG_WE){}
+    wr_max10_leds(0x0, SEL_01, true);
+    while (!FLG_WE){}
+    wr_max10_leds(0x0, SEL_10, true);
+    while (!FLG_WE){}
+    wr_max10_leds(0x0, SEL_11, true);
+}
