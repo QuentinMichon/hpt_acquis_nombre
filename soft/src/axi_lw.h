@@ -25,11 +25,9 @@
 #include <stdint.h>
 
 // Base address
-#define AXI_LW_HPS_FPGA_BASE_ADD   0xFF200000
+#define AXI_LW_HPS_FPGA_BASE_ADD        0xFF200000
+#define AXI_LW_HPS_FPGA_ZONE_DISPO      0xFF210000
 
-// ACCESS MACROS
-#define AXI_LW_REG(_x_)   *(volatile uint32_t *)(AXI_LW_HPS_FPGA_BASE_ADD + _x_) // _x_ is an offset with respect to the base address
 
-//base
-#define PIO_CORE0_BASE_ADD1         0xFF210000
-#define PIO_CORE0_BASE_ADD2         0xFF210000
+
+
