@@ -1,8 +1,0 @@
-*.axf
-*.mk
-*.d
-*.o
-*/Debug/makefile
-*.cproject
-*.project
-*.settings
