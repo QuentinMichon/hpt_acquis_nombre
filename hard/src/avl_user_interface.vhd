@@ -76,6 +76,15 @@ architecture rtl of avl_user_interface is
 	 signal reg_delay_gen : std_logic_vector(1 downto 0);
 	 signal cmd_new_nbr : std_logic;
 	 signal cmd_init_nbr : std_logic;
+	 signal reg_safe_s   : std_logic;  -- part 2 | used to set safe mode enable or not
+	 signal cmd_take_snap : std_logic; -- part 2 | used to take a picture of a,b,c,d
+	 --  BLOC safe
+	 signal reg_nbr_a_s : std_logic_vector(21 downto 0);
+	 signal reg_nbr_b_s : std_logic_vector(21 downto 0);
+	 signal reg_nbr_c_s : std_logic_vector(21 downto 0);
+	 signal reg_nbr_d_s : std_logic_vector(21 downto 0);
+    signal we_eq_s     : std_logic;
+	 signal flg_eq_en_s : std_logic;
 begin
     -- Output zone
 	 avl_readdatavalid_o <= cmd_readdatavalid_s;
@@ -87,6 +96,12 @@ begin
 	 cmd_new_nbr_o <= cmd_new_nbr;
 	 auto_o <= reg_mode_gen;
 	 delay_o <= reg_delay_gen;
+	 
+	 reg_status_s <= reg_safe_s & flg_eq_en_s; -- part 2
+	 
+	 -- TODO DELETE
+	 flg_eq_en_s  <= '0';
+	 we_eq_s <= '0';
 	 
     -- Read access part
     read_access_p : process(avl_reset_i, avl_clk_i)
@@ -117,8 +132,9 @@ begin
 						  when 5 =>
 						      reg_readdata_s <= (31 downto 5 => '0') & reg_mode_gen & (3 downto 2 => '0') & reg_delay_gen; 
 								cmd_readdatavalid_s <= '1';
-						  --when 6 =>
-								-- AVAILABLE FOR NEW FUNCTIONALITY
+						  when 6 =>
+								reg_readdata_s <= (31 downto 1 => '0') & reg_safe_s;
+								cmd_readdatavalid_s <= '1';
 						  --when 7 =>
 						      -- AVAILABLE FOR NEW FUNCTIONALITY
 						  when 8 =>
@@ -154,12 +170,12 @@ begin
 		      cmd_new_nbr      <= '0';
 				cmd_init_nbr     <= '1';              -- on initialise la fonction a 0+0+0=0
 				reg_leds_soc_s   <= (others => '0');
-				reg_status_s     <= (others => '0');
 				reg_mode_gen     <= '0';              -- mode manuel par defaut
 				reg_delay_gen    <= (others => '0');
 		  elsif rising_edge(avl_clk_i) then
-		      cmd_new_nbr  <= '0';  -- fin de la pulse d'un coup de clock
-			   cmd_init_nbr <= '0';  -- fin de la pulse d'un coup de clock
+		      cmd_new_nbr   <= '0';  -- fin de la pulse d'un coup de clock
+			   cmd_init_nbr  <= '0';  -- fin de la pulse d'un coup de clock
+				cmd_take_snap <= '0';  -- fin de la pulse d'un coup de clock
 		  
 		      if avl_write_i = '1' then
 				    case(to_integer(unsigned(avl_address_i))) is
@@ -178,8 +194,10 @@ begin
 						      reg_mode_gen  <= avl_writedata_i(4);
 								reg_delay_gen <= avl_writedata_i(1 downto 0);
 								
-						  --when 6  => AVAILABLE FOR NEW FUNCTIONALITY
-						  --when 7  => AVAILABLE FOR NEW FUNCTIONALITY
+						  when 6  => 
+						      reg_safe_s <= avl_writedata_i(0);
+						  when 7  =>
+						      cmd_take_snap <= '1';
 						  --when 8  => NOT USED
 						  --when 9  => NOT USED
 						  --when 10 => NOT USED
@@ -197,5 +215,22 @@ begin
 
 	 
 	 
-    
+	 regs_snap_p : process(avl_reset_i, avl_clk_i)
+	 begin
+	     if avl_reset_i = '1' then
+		      reg_nbr_a_s <= (others => '0');
+				reg_nbr_b_s <= (others => '0');
+				reg_nbr_c_s <= (others => '0');
+				reg_nbr_d_s <= (others => '0');
+	     elsif rising_edge(avl_clk_i) then
+		      if we_eq_s = '1' OR reg_safe_s = '0' then
+				    reg_nbr_a_s <= nbr_a_i;
+					 reg_nbr_b_s <= nbr_b_i;
+					 reg_nbr_c_s <= nbr_c_i;
+					 reg_nbr_d_s <= nbr_d_i;
+				end if;
+		  end if;
+    end process;
+	 
+	 
 end rtl; 
