@@ -51,7 +51,7 @@ int main(void){
     
     //init
     init_leds();
-
+    init_nbr();
     
     while (1){
 
@@ -69,28 +69,22 @@ int main(void){
         uint32_t mode = (sw & mask) >> 7;
         //printf("mode : %d \n", mode);
         write_mode_gen(mode);
-        
+
         //acquisition fiable avec sw0 (partie 2) 
         //TODO
         
         if (key_pressed(0)){ //réf
-           //init les nombres
-            init_nbr(true);
+            //init les nombres
+            init_nbr();
         }
         
         if (key_pressed(1)){ //réf
             //générer un nouveal ensemble de 4 nombres (ssi mode manuel est selectionné)
             if (get_mode_gen() == 0) //mode_gen 0 = manuel !
-                new_nbr(true);
+                new_nbr();
         }
         
         if (key_holding(2)){
-            //génerer nouveaux nombres à chaque boucle si on est en mode auto
-            if (get_mode_gen() == 1){ //mode_gen 1 = auto !
-                new_nbr(true);
-                //printf("new nbr car mode = 1\n");
-            }
-            
             //lecture successive des 4 nombres
             uint32_t n0 = get_nbr_value(0);
             uint32_t n1 = get_nbr_value(1);
