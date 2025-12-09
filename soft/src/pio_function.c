@@ -75,24 +75,12 @@ uint32_t read_status(){
     return BASE_ADD(STATUS) & mask;
 }
     
-void new_nbr(bool n){ 
-    uint32_t status = BASE_ADD(STATUS);
-    uint32_t mask = (1 << 4);
-    
-    if (n)
-        BASE_ADD(STATUS) = (status | mask);
-    else
-        BASE_ADD(STATUS) = (status | ~mask);
+void new_nbr(){
+	BASE_ADD(STATUS) = (1 << 4);
 }
     
-void init_nbr(bool init){ 
-    uint32_t mask = 1;
-    uint32_t status = BASE_ADD(STATUS);
-    
-    if (init)
-        BASE_ADD(STATUS) = (status | mask);
-    else 
-        BASE_ADD(STATUS) = (status & ~mask); //ici ??
+void init_nbr(){
+    BASE_ADD(STATUS) = (1 << 0);
 }
 
 //gen_function

@@ -53,8 +53,8 @@ uint32_t get_nbr_value(uint32_t nbr);
 
 //status functions
 uint32_t read_status();
-void new_nbr(bool n);
-void init_nbr(bool init);
+void new_nbr();
+void init_nbr();
 
 //gen_function
 uint32_t get_mode_gen();
