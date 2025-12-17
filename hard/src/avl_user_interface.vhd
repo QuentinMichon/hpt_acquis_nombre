@@ -85,6 +85,14 @@ architecture rtl of avl_user_interface is
 	 signal reg_nbr_d_s : std_logic_vector(21 downto 0);
     signal we_eq_s     : std_logic;
 	 signal flg_eq_en_s : std_logic;
+	 -- MSS
+	 signal mss_pres_s : std_logic_vector(1 downto 0);
+	 signal mss_fut_s  : std_logic_vector(1 downto 0);
+	 constant E_WAIT_SNAP_REQ : std_logic_vector(1 downto 0) := "00";
+	 constant E_SAVE          : std_logic_vector(1 downto 0) := "01";
+	 constant E_EQ_READABLE   : std_logic_vector(1 downto 0) := "10";
+	 
+	 
 begin
     -- Output zone
 	 avl_readdatavalid_o <= cmd_readdatavalid_s;
@@ -97,11 +105,7 @@ begin
 	 auto_o <= reg_mode_gen;
 	 delay_o <= reg_delay_gen;
 	 
-	 reg_status_s <= reg_safe_s & flg_eq_en_s; -- part 2
-	 
-	 -- TODO DELETE
-	 flg_eq_en_s  <= '0';
-	 we_eq_s <= '0';
+	 reg_status_s <= '1' & flg_eq_en_s; -- part 2
 	 
     -- Read access part
     read_access_p : process(avl_reset_i, avl_clk_i)
@@ -138,16 +142,16 @@ begin
 						  --when 7 =>
 						      -- AVAILABLE FOR NEW FUNCTIONALITY
 						  when 8 =>
-								reg_readdata_s <= (31 downto 24 => '0') & "00" & nbr_a_i;
+								reg_readdata_s <= (31 downto 24 => '0') & "00" & reg_nbr_a_s;
 								cmd_readdatavalid_s <= '1';
 						  when 9 =>
-								reg_readdata_s <= (31 downto 24 => '0') & "01" & nbr_b_i;
+								reg_readdata_s <= (31 downto 24 => '0') & "01" & reg_nbr_b_s;
 								cmd_readdatavalid_s <= '1';
 						  when 10 =>
-								reg_readdata_s <= (31 downto 24 => '0') & "10" & nbr_c_i;
+								reg_readdata_s <= (31 downto 24 => '0') & "10" & reg_nbr_c_s;
 								cmd_readdatavalid_s <= '1';
 						  when 11 =>
-								reg_readdata_s <= (31 downto 24 => '0') & "11" & nbr_d_i;
+								reg_readdata_s <= (31 downto 24 => '0') & "11" & reg_nbr_d_s;
 								cmd_readdatavalid_s <= '1';
 						  when others =>
 						      -- RESERVED TO 15
@@ -204,7 +208,6 @@ begin
 						  --when 11 => NOT USED
 						  
 				        when others =>
-						      -- RESERVED TO 15
 								-- THEN NOT USED
                         null;
                 end case;
@@ -232,5 +235,48 @@ begin
 		  end if;
     end process;
 	 
+	 -------------------------------- MSS -----------------------------
 	 
+	 process (reg_safe_s, cmd_take_snap, mss_pres_s)
+	 begin
+	     mss_fut_s   <= E_WAIT_SNAP_REQ;
+		  we_eq_s     <= '0';
+		  flg_eq_en_s <= '0';
+		  
+		  case mss_pres_s is
+		      when E_WAIT_SNAP_REQ =>
+				    if(cmd_take_snap = '1' AND reg_safe_s = '1') then
+					     mss_fut_s <= E_SAVE;
+					 else
+					     mss_fut_s <= E_WAIT_SNAP_REQ;
+				    end if;
+					 
+			   when E_SAVE =>
+				    we_eq_s <= '1';
+				    mss_fut_s <= E_EQ_READABLE;
+					 
+			   when E_EQ_READABLE =>
+				    flg_eq_en_s <= '1';
+					 if (cmd_take_snap = '1' AND reg_safe_s = '1') then
+					     mss_fut_s <= E_SAVE;
+					 elsif (cmd_take_snap = '0' AND reg_safe_s = '1') then
+					     mss_fut_s <= E_EQ_READABLE;
+				    else 
+					     mss_fut_s <= E_WAIT_SNAP_REQ;
+					 end if;
+					 
+		      when others =>
+				    mss_fut_s <= E_WAIT_SNAP_REQ;
+	     end case;
+	 end process;
+	 
+	 
+	 MSS: process (avl_clk_i, avl_reset_i)
+	 begin 
+	     if (avl_reset_i = '1') then
+		      mss_pres_s <= E_WAIT_SNAP_REQ;
+		  elsif rising_edge(avl_clk_i) then
+		      mss_pres_s <= mss_fut_s;
+		  end if;
+	 end process;
 end rtl; 

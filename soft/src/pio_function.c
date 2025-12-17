@@ -152,10 +152,21 @@ void init_leds(){
 }
 
 
+void set_safe_mode(bool safe) {
+	if (safe) {
+		BASE_ADD(REG_SAFE) = 1;
+	} else {
+		BASE_ADD(REG_SAFE) = 0;
+	}
+}
 
+uint32_t read_safe_mode() {
+	return BASE_ADD(REG_SAFE) & (1 << 0);
+}
 
-
-
+void take_snap() {
+	BASE_ADD(SNAP) = 0; // value don't care
+}
 
 
 

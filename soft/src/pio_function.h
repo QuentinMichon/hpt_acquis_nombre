@@ -40,6 +40,8 @@
 #define LEDS        0x0C
 #define STATUS      0x10
 #define GEN         0x14
+#define REG_SAFE    0x18
+#define SNAP        0x1C
 #define NBR_A       0x20
 #define NBR_B       0x24
 #define NBR_C       0x28
@@ -77,7 +79,11 @@ uint32_t get_leds(void);
 void put_leds(uint32_t leds);
 void init_leds(void);
 
+void set_safe_mode(bool safe);
 
+void set_safe_mode(bool safe);
+uint32_t read_safe_mode();
+void take_snap();
 
 //------
 // 0xFF200000 à 0xFF3FFFFF

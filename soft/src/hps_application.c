@@ -70,8 +70,12 @@ int main(void){
         //printf("mode : %d \n", mode);
         write_mode_gen(mode);
 
-        //acquisition fiable avec sw0 (partie 2) 
-        //TODO
+        // set/clear acquisition fiable
+        if (sw & (1 << 0)) {
+        	set_safe_mode(true);
+        } else {
+        	set_safe_mode(false);
+        }
         
         if (key_pressed(0)){ //réf
             //init les nombres
@@ -85,6 +89,21 @@ int main(void){
         }
         
         if (key_holding(2)){
+
+        	//printf("reg safe mode : %d\n", read_safe_mode());
+        	//printf("status before snap : %d\n", read_status());
+
+        	// demander le maintiens
+        	if(read_safe_mode()) {
+        		// on prend une photo
+        		//printf("take snap\n");
+        		take_snap();
+        		// on attend que la photo sois prise
+        		while(read_status() == 0b10){
+        			//printf("status : %d\n", read_status());
+        		}
+        	}
+
             //lecture successive des 4 nombres
             uint32_t n0 = get_nbr_value(0);
             uint32_t n1 = get_nbr_value(1);
