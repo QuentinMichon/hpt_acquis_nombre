@@ -158,10 +158,11 @@ begin
 						      -- THEN NOT USED
 								if unsigned(avl_address_i) > 15 then 
 								    reg_readdata_s <= X"AAAABBBB"; -- 1010'1010'1010'1010'0101'0101'0101'0101
+									 cmd_readdatavalid_s <= '1'; -- permet de lire une constante qui indique RESERVED ou NOT USED
 								else
 									 reg_readdata_s <= X"3333CCCC"; -- 0011'0011'0011'0011'1100'1100'1100'1100
+									 cmd_readdatavalid_s <= '1'; -- permet de lire une constante qui indique RESERVED ou NOT USED
 								end if;
-								cmd_readdatavalid_s <= '1'; -- permet de lire une constante qui indique RESERVED ou NOT USED
 				    end case;
             end if;
         end if;
@@ -208,8 +209,9 @@ begin
 						  --when 11 => NOT USED
 						  
 				        when others =>
-								-- THEN NOT USED
-                        null;
+								-- RESERVED TO 15
+						      -- THEN NOT USED
+								null
                 end case;
             end if;
         end if;
