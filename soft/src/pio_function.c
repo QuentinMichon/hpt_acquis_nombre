@@ -44,6 +44,7 @@ uint32_t get_nbr_x(int nbr){
     } else if (nbr==3) {
         return BASE_ADD(NBR_D);
     }
+    return -1; // -1 en cas d'erreur
 }
 
 uint32_t get_nbr_code(uint32_t nbr){

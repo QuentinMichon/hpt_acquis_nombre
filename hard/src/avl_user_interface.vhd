@@ -211,7 +211,7 @@ begin
 				        when others =>
 								-- RESERVED TO 15
 						      -- THEN NOT USED
-								null
+								null;
                 end case;
             end if;
         end if;

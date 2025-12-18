@@ -35,6 +35,8 @@ int err_cum = 0;
 
 bool key_pressed(int key_number);
 bool key_holding(int key_number);
+const char *read_status_str(uint32_t status);
+
 
 bool holding = false;
 
@@ -116,15 +118,15 @@ int main(void){
             
             if (equal){
                 
-                printf("%-3s : status: %-7lu, somme: %-7lu, nbr_a: %-7lu, nbr_b: %-7lu, nbr_c: %-7lu, nbr_d: %-7lu, \n",
+                printf("%-3s : status: %-7s, somme: %-7lu, nbr_a: %-7lu, nbr_b: %-7lu, nbr_c: %-7lu, nbr_d: %-7lu, \n",
                        "OK",
-                       read_status(),sum, n0, n1, n2, n3); //TODO : vérifier sous quelle forme afficher status 
+                       read_status_str(read_status()),sum, n0, n1, n2, n3);
             }
             
             else {
-                printf("%-3s : status: %-7lu, somme: %-7lu, nbr_a: %-7lu, nbr_b: %-7lu, nbr_c: %-7lu, nbr_d: %-7lu, \n",
+                printf("%-3s : status: %-7s, somme: %-7lu, nbr_a: %-7lu, nbr_b: %-7lu, nbr_c: %-7lu, nbr_d: %-7lu, \n",
                     "ER",
-                       read_status(),sum,n0, n1, n2, n3); //TODO : vérifier sous quelle forme afficher status 
+                       read_status_str(read_status()),sum,n0, n1, n2, n3);
         
                 printf("ER : nombre d'erreur cumulée : %d \n", err_cum);
                 ++err_cum;
@@ -132,7 +134,6 @@ int main(void){
         }
     }
 }
-
 
 /* -------------------------------------------------- */
 // fonction pour "presser un bouton"
@@ -146,4 +147,17 @@ bool key_pressed(int key_number) {
 
 bool key_holding(int key_number) {
     return Key_read(key_number);
+}
+
+const char *read_status_str(uint32_t status){
+    uint32_t s = status &= 0x3; //garder que les deux derniers bits
+
+    if (s==0)
+        return "00";
+    else if (status==1)
+        return "01";
+    else if (status==2)
+        return "10";
+    else
+        return "11";
 }
